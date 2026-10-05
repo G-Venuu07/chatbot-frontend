@@ -13,7 +13,7 @@ function App() {
     try {
 
       const result = await axios.get(
-        "http://localhost:8080/api/chat",
+        "https://chatbot-backend-y0gs.onrender.com/api/chat",
         {
           params: {
             message: message
