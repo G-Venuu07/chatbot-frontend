@@ -1,0 +1,24 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+#root {
+  width: 600px;
+  margin: 50px auto;
+}
+
+input {
+  width: 70%;
+  padding: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  margin-left: 10px;
+}
+
+.chat {
+  margin-top: 30px;
+  padding: 15px;
+  border: 1px solid gray;
+}
