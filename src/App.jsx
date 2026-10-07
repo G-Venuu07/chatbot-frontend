@@ -1,57 +1,108 @@
 import { useState } from "react";
 import axios from "axios";
+import "./App.css";
+
 function App() {
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [response, setResponse] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const sendMessage = async () => {
-    if (message.trim() === "") {
+    if (message.trim() === "" || loading) {
       return;
     }
+
+    const userMessage = message;
+
+    setMessages((oldMessages) => [
+      ...oldMessages,
+      {
+        sender: "user",
+        text: userMessage
+      }
+    ]);
+
+    setMessage("");
     setLoading(true);
 
     try {
-
       const result = await axios.get(
         "https://chatbot-backend-y0gs.onrender.com/api/chat",
         {
           params: {
-            message: message
+            message: userMessage
           }
         }
       );
 
-      setResponse(result.data);
-
+      setMessages((oldMessages) => [
+        ...oldMessages,
+        {
+          sender: "ai",
+          text: result.data
+        }
+      ]);
     } catch (error) {
-
-      setResponse("Something went wrong. Please try again.");
-
+      setMessages((oldMessages) => [
+        ...oldMessages,
+        {
+          sender: "ai",
+          text: "Something went wrong. Please try again."
+        }
+      ]);
     }
 
-    setMessage("");
     setLoading(false);
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
+
+  const clearChat = () => {
+    setMessages([]);
+  };
+
   return (
     <div className="chat">
       <h1>AI Chatbot</h1>
+
+      <div className="messages">
+        {messages.length === 0 && (
+          <p>
+            <strong>Gemini:</strong> Hello! How can I help you?
+          </p>
+        )}
+
+        {messages.map((msg, index) => (
+          <p key={index}>
+            <strong>
+              {msg.sender === "user" ? "You" : "Gemini"}:
+            </strong>{" "}
+            {msg.text}
+          </p>
+        ))}
+
+        {loading && (
+          <p>
+            <strong>Gemini:</strong> Thinking...
+          </p>
+        )}
+      </div>
 
       <input
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="Ask something..."
       />
 
       <button onClick={sendMessage}>Send</button>
 
-      <div>
-      <p><strong>You:</strong> {message}</p>
-      <p>
-      <strong>Gemini:</strong>{" "}
-      {loading ? "Thinking..." : response}
-    </p>
-    </div>
+      <button onClick={clearChat}>Clear Chat</button>
     </div>
   );
 }
